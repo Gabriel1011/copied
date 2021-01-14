@@ -2,6 +2,7 @@ const { ipcRenderer, clipboard } = require('electron');
 const clipboardWatcher = require('electron-clipboard-watcher')
 
 let copies = [];
+let primeiroTexto = "";
 criarLista ();
 
 clipboardWatcher({
@@ -46,15 +47,16 @@ function renderItem(item){
   lista.insertBefore(elemento, lista.firstChild);
 }
 
-function criarItem(item){
-    item = { id: uuidv4(), texto: item, dataCriacao: Date.now() };
+function criarItem(texto){
+    primeiroTexto = texto;
+    item = { id: uuidv4(), texto: texto, dataCriacao: Date.now() };
 
     addJsonStorage(item);
     renderItem(item);
 }
 
 function filtrarItens(texto){
-  var input, filter, ul, li, a, i, txtValue;
+  var input, filter, ul, li, txtValue;
   input = document.getElementById('pesquisa');
   filter = input.value.toUpperCase();
 
@@ -90,7 +92,7 @@ function esconderTela(){
 }
 
 function enviarItemParaClipBoard(item){
-  deletarItem(item);
+  if(primeiroTexto != item.texto) deletarItem(item);
   clipboard.writeText(item.texto);
   esconderTela();
   limparCampoPesquisa();
