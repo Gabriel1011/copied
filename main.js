@@ -3,7 +3,7 @@ const { app, BrowserWindow, ipcMain, Tray, Menu, application, globalShortcut, sc
 let mainWindow = null;
 app.on('ready', () => {
 
-  let mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 400,
     height: 500,
     x: getMousePosition().x,
@@ -31,9 +31,9 @@ app.on('ready', () => {
     return false;
   });
 
-  globalShortcut.register("Shift+Control+c", () => { showMainWindow(mainWindow); });
-  globalShortcut.register("Shift+Control+x", () => { mainWindow.hide(); });
-  globalShortcut.register("Esc", () => { mainWindow.hide(); });
+  globalShortcut.register("Shift+CmdOrCtrl+c", () => { showMainWindow(mainWindow); });
+  globalShortcut.register("Shift+CmdOrCtrl+x", () => { esconderTela(); });
+  globalShortcut.register("Esc", () => { esconderTela(); });
 
   tray = criarTrayMenu(mainWindow);
 });
@@ -44,7 +44,7 @@ app.on('window-all-closed', () => {
   }
 });
 
-function criarTrayMenu(mainWindow){
+function criarTrayMenu(mainWindow) {
   var contextMenu = Menu.buildFromTemplate([
     {
       label: 'Abrir App', click: function () {
@@ -59,16 +59,25 @@ function criarTrayMenu(mainWindow){
     }
   ]);
 
-  tray = new Tray('icon.png');
+  tray = new Tray(__dirname + '/app/assets/icon.png');
   tray.setContextMenu(contextMenu);
   return tray;
 }
 
-function getMousePosition(){
+function getMousePosition() {
   return screen.getCursorScreenPoint();
 }
 
-function showMainWindow(mainWindow){
+function showMainWindow(mainWindow) {
   mainWindow.setPosition(getMousePosition().x, getMousePosition().y);
   mainWindow.show();
 }
+
+function esconderTela(){
+  mainWindow.hide();
+  mainWindow.send('lipar-campo-pesquisa');
+}
+
+ipcMain.on('esconde-tela', (event) => {
+  esconderTela();
+});

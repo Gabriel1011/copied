@@ -15,6 +15,7 @@ clipboardWatcher({
     console.log(text);
     copies.push(text);
     criarItem(text);
+    topoTela();
   }
 })
 
@@ -39,7 +40,7 @@ function renderItem(item){
 
   ["list-group-item", "list-item"].forEach(element => { elemento.classList.add(element); });
 
-  elemento.addEventListener("click", () => { clipboard.writeText(item.texto); })
+  elemento.addEventListener("click", () => { enviarItemParaClipBoard(item.texto); })
 
   var lista = document.getElementById("copies");
   lista.insertBefore(elemento, lista.firstChild);
@@ -79,3 +80,29 @@ function deletarItem(item) {
       li[i].innerText = "";
   }
 }
+
+function esconderTela(){
+  ipcRenderer.send('esconde-tela');
+}
+
+function enviarItemParaClipBoard(texto){
+  clipboard.writeText(texto);
+  esconderTela();
+  limparCampoPesquisa();
+}
+
+function topoTela() {
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
+}
+
+function limparCampoPesquisa(){
+  campoPesquisa = document.getElementById('pesquisa');
+  campoPesquisa.value = "";
+  filtrarItens();
+}
+
+ipcRenderer.on('lipar-campo-pesquisa', ()=>{
+  limparCampoPesquisa();
+  topoTela();
+})
