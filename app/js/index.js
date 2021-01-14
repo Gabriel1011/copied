@@ -40,7 +40,7 @@ function renderItem(item){
 
   ["list-group-item", "list-item"].forEach(element => { elemento.classList.add(element); });
 
-  elemento.addEventListener("click", () => { enviarItemParaClipBoard(item.texto); })
+  elemento.addEventListener("click", () => { enviarItemParaClipBoard(item); })
 
   var lista = document.getElementById("copies");
   lista.insertBefore(elemento, lista.firstChild);
@@ -61,32 +61,37 @@ function filtrarItens(texto){
   ul = document.getElementById("copies");
   li = ul.getElementsByClassName('list-item');
 
-  for (let i = 0; i < li.length; i++) {
-    txtValue = li[i].textContent || li[i].innerText;
-    txtValue.toUpperCase().indexOf(filter) > -1 ?
-    li[i].style.display = "" :
-    li[i].style.display = "none" ;
-  }
+  [...li].map((l)=>{
+    txtValue = l.textContent || l.innerText;
+
+    if(txtValue.toUpperCase().indexOf(filter) > -1){
+      l.style.display = "";
+      l.innerHTML = txtValue.toUpperCase().replace(filter, '<span class="text-find">' + filter + '</span>' ).toLowerCase();
+    }else{
+      l.style.display = "none";
+    }
+  });
 }
 
 function deletarItem(item) {
-  ul = document.getElementById("copies");
+  ul = document.querySelector('ul');
   li = ul.getElementsByClassName('list-item');
 
-  for (let i = 0; i < li.length; i++) {
-    txtValue = li[i].textContent || li[i].innerText;
-
-    if(txtValue.toUpperCase() == item.texto)
-      li[i].innerText = "";
-  }
+  [...li].map((l) => {
+    if(l.id == item.id){
+      ul.removeChild(l);
+      deleteJsonStorage(item);
+    }
+  });
 }
 
 function esconderTela(){
   ipcRenderer.send('esconde-tela');
 }
 
-function enviarItemParaClipBoard(texto){
-  clipboard.writeText(texto);
+function enviarItemParaClipBoard(item){
+  deletarItem(item);
+  clipboard.writeText(item.texto);
   esconderTela();
   limparCampoPesquisa();
 }

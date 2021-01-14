@@ -7,16 +7,25 @@ function getAllJsonStorage(){
   return JSON.parse(rawdata);
 }
 
-function addJsonStorage(dados) {
+function addJsonStorage(item) {
   let data = getAllJsonStorage();
 
-  data.push(dados);
-  data = JSON.stringify(data);
-  fs.writeFileSync('db.json', data);
+  data.push(item);
+  salvarElementos(data);
 }
 
-function deleteJsonStorage(id) {
+function deleteJsonStorage(item) {
+  let data = getAllJsonStorage();
+  data = data.filter((value, index, arr)=> {
+    return value.texto != item.texto;
+  })
 
+  salvarElementos(data);
+}
+
+function salvarElementos(data){
+  data = JSON.stringify(data);
+  fs.writeFileSync('db.json', data);
 }
 
 function uuidv4() {

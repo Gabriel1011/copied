@@ -20,7 +20,7 @@ app.on('ready', () => {
     mainWindow.hide();
   });
 
-  mainWindow.removeMenu();
+  // mainWindow.removeMenu();
 
   mainWindow.on('close', function (event) {
     if (!app.isQuiting) {
